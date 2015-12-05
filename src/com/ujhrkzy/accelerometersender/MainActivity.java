@@ -2,13 +2,11 @@ package com.ujhrkzy.accelerometersender;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,7 +20,7 @@ import android.widget.EditText;
 public class MainActivity extends Activity {
     private final static int DEVICES_DIALOG = 1;
     private final static int ERROR_DIALOG = 2;
-    private final BluetoothTask bluetoothTask;
+    // private final BluetoothTask bluetoothTask;
     private AccelerometerSensor accelerometerSensor;
     private ProgressDialog waitDialog;
     private EditText editTextX;
@@ -31,7 +29,7 @@ public class MainActivity extends Activity {
     private String errorMessage = "";
 
     public MainActivity() {
-        this.bluetoothTask = new BluetoothTask(this);
+        // this.bluetoothTask = new BluetoothTask(this);
     }
 
     @Override
@@ -45,7 +43,7 @@ public class MainActivity extends Activity {
         AccelerometerEventListener listener = createViewEventListener(
                 editTextX, editTextY, editTextZ);
         listeners.add(listener);
-        listeners.add(bluetoothTask.createAccelerometerEventListener());
+        // listeners.add(bluetoothTask.createAccelerometerEventListener());
         this.accelerometerSensor = new AccelerometerSensor(listeners);
         accelerometerSensor.onCreate((SensorManager) this
                 .getSystemService(Context.SENSOR_SERVICE));
@@ -54,7 +52,8 @@ public class MainActivity extends Activity {
         resetButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                bluetoothTask.doSend("reset");
+                accelerometerSensor.reset();
+                // bluetoothTask.doSend("reset");
             }
         });
     }
@@ -78,7 +77,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         accelerometerSensor.onResume();
-        bluetoothTask.init();
+        // bluetoothTask.init();
         // ペアリング済みデバイスの一覧を表示してユーザに選ばせる。
         showDialog(DEVICES_DIALOG);
     }
@@ -91,7 +90,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        bluetoothTask.doClose();
+        // bluetoothTask.doClose();
         super.onDestroy();
     }
 
@@ -106,9 +105,9 @@ public class MainActivity extends Activity {
     @Override
     protected Dialog onCreateDialog(int id) {
         if (id == DEVICES_DIALOG)
-            return createDevicesDialog();
-        if (id == ERROR_DIALOG)
-            return createErrorDialog();
+            // return createDevicesDialog();
+            if (id == ERROR_DIALOG)
+                return createErrorDialog();
         return null;
     }
 
@@ -121,31 +120,31 @@ public class MainActivity extends Activity {
         super.onPrepareDialog(id, dialog);
     }
 
-    public Dialog createDevicesDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Select device");
-
-        // ペアリング済みデバイスをダイアログのリストに設定する。
-        Set<BluetoothDevice> pairedDevices = bluetoothTask.getPairedDevices();
-        final BluetoothDevice[] devices = pairedDevices
-                .toArray(new BluetoothDevice[0]);
-        String[] items = new String[devices.length];
-        for (int i = 0; i < devices.length; i++) {
-            items[i] = devices[i].getName();
-        }
-
-        alertDialogBuilder.setItems(items,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        // 選択されたデバイスを通知する。そのまま接続開始。
-                        bluetoothTask.doConnect(devices[which]);
-                    }
-                });
-        alertDialogBuilder.setCancelable(false);
-        return alertDialogBuilder.create();
-    }
+    // public Dialog createDevicesDialog() {
+    // AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+    // alertDialogBuilder.setTitle("Select device");
+    //
+    // // ペアリング済みデバイスをダイアログのリストに設定する。
+    // Set<BluetoothDevice> pairedDevices = bluetoothTask.getPairedDevices();
+    // final BluetoothDevice[] devices = pairedDevices
+    // .toArray(new BluetoothDevice[0]);
+    // String[] items = new String[devices.length];
+    // for (int i = 0; i < devices.length; i++) {
+    // items[i] = devices[i].getName();
+    // }
+    //
+    // alertDialogBuilder.setItems(items,
+    // new DialogInterface.OnClickListener() {
+    // @Override
+    // public void onClick(DialogInterface dialog, int which) {
+    // dialog.dismiss();
+    // // 選択されたデバイスを通知する。そのまま接続開始。
+    // bluetoothTask.doConnect(devices[which]);
+    // }
+    // });
+    // alertDialogBuilder.setCancelable(false);
+    // return alertDialogBuilder.create();
+    // }
 
     @SuppressWarnings("deprecation")
     public void errorDialog(String msg) {

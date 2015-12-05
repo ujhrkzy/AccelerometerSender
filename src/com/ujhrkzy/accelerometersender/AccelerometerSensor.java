@@ -9,9 +9,12 @@ import android.hardware.SensorManager;
 
 public class AccelerometerSensor implements SensorEventListener {
 
-    private SensorManager sensorManager;
+    // private final OrientationEstimater estimater = new
+    // OrientationEstimater();
+    private final Estimater1 estimater = new Estimater1();
 
-    private List<AccelerometerEventListener> listeners;
+    private final List<AccelerometerEventListener> listeners;
+    private SensorManager sensorManager;
 
     public AccelerometerSensor(List<AccelerometerEventListener> listeners) {
         this.sensorManager = null;
@@ -34,13 +37,17 @@ public class AccelerometerSensor implements SensorEventListener {
         if (sensorManager == null) {
             return;
         }
-        List<Sensor> sensorList = sensorManager
-                .getSensorList(Sensor.TYPE_ACCELEROMETER);
-        if (sensorList != null && !sensorList.isEmpty()) {
-            Sensor sensor = sensorList.get(0);
-            sensorManager.registerListener(this, sensor,
-                    SensorManager.SENSOR_DELAY_NORMAL);
-        }
+        // Sensor sensorAccel = sensorManager
+        // .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Sensor sensorAccel = sensorManager
+                .getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        sensorManager.registerListener(this, sensorAccel,
+                SensorManager.SENSOR_DELAY_UI);
+
+        // Sensor sensorGyro = sensorManager
+        // .getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        // sensorManager.registerListener(this, sensorGyro,
+        // SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     /**
@@ -55,13 +62,26 @@ public class AccelerometerSensor implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) {
+        int type = event.sensor.getType();
+        // if (type != Sensor.TYPE_ACCELEROMETER && type !=
+        // Sensor.TYPE_GYROSCOPE) {
+        // return;
+        // }
+        if (type != Sensor.TYPE_LINEAR_ACCELERATION
+                && type != Sensor.TYPE_GYROSCOPE) {
             return;
         }
-        AccelerometerValue value = new AccelerometerValue(event.values[0],
-                event.values[1], event.values[2]);
+
+        estimater.onSensorEvent(event);
+        float[] position = estimater.getPosition();
+        AccelerometerValue value = new AccelerometerValue(position[0],
+                position[1], position[2]);
         for (AccelerometerEventListener listener : listeners) {
             listener.accept(value);
         }
+    }
+
+    public void reset() {
+        estimater.reset();
     }
 }
