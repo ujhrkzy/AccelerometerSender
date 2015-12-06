@@ -12,11 +12,16 @@ import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class BluetoothTask {
+/**
+ * {@link BluetoothConnector}
+ * 
+ * @author ujhrkzy
+ *
+ */
+public class BluetoothConnector {
     private static final String TAG = "BluetoothTask";
-    /**
-     * UUIDはサーバと一致している必要がある。 - 独自サービスのUUIDはツールで生成する。（ほぼ乱数） - 注：このまま使わないように。
-     */
+    // UUIDはサーバと一致している必要がある。
+    // TBD 乱数で生成する。
     private static final UUID APP_UUID = UUID
             .fromString("11111111-1111-1111-1111-111111111123");
 
@@ -27,7 +32,8 @@ public class BluetoothTask {
     private InputStream btIn;
     private OutputStream btOut;
 
-    public BluetoothTask(MainActivity activity) {
+    public BluetoothConnector(MainActivity activity) {
+        // TBD null check
         this.activity = activity;
     }
 
@@ -84,9 +90,14 @@ public class BluetoothTask {
         return new AccelerometerEventListener() {
 
             @Override
-            public void accept(AccelerometerValue value) {
-                String msg = String.format("x:%s,y:%s,z:%s", value.getValueX(),
-                        value.getValueY(), value.getValueZ());
+            public void accept(PositionValue value) {
+                String msg;
+                if (value == null) {
+                    msg = String.format("x:%s,y:%s,z:%s", 0, 0, 0);
+                } else {
+                    msg = String.format("x:%s,y:%s,z:%s", value.getValueX(),
+                            value.getValueY(), value.getValueZ());
+                }
                 doSend(msg);
             }
         };

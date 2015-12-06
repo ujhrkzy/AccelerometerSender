@@ -7,22 +7,29 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+/**
+ * {@link AccelerometerSensor}
+ * 
+ * @author ujhrkzy
+ *
+ */
 public class AccelerometerSensor implements SensorEventListener {
 
-    // private final OrientationEstimater estimater = new
-    // OrientationEstimater();
-    private final Estimater1 estimater = new Estimater1();
-
+    private final PositionEstimator estimater = new PositionEstimator();
     private final List<AccelerometerEventListener> listeners;
-    private SensorManager sensorManager;
+    private final SensorManager sensorManager;
 
-    public AccelerometerSensor(List<AccelerometerEventListener> listeners) {
-        this.sensorManager = null;
-        this.listeners = listeners;
-    }
-
-    public void onCreate(SensorManager sensorManager) {
+    /**
+     * Constructor
+     * 
+     * @param listeners
+     *            {@link AccelerometerEventListener} のリスト
+     */
+    public AccelerometerSensor(SensorManager sensorManager,
+            List<AccelerometerEventListener> listeners) {
+        // TBD null check
         this.sensorManager = sensorManager;
+        this.listeners = listeners;
         onResume();
     }
 
@@ -34,53 +41,37 @@ public class AccelerometerSensor implements SensorEventListener {
      * アクティビティが動き始めたらリスナーを登録する
      */
     public void onResume() {
-        if (sensorManager == null) {
-            return;
-        }
-        // Sensor sensorAccel = sensorManager
-        // .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         Sensor sensorAccel = sensorManager
                 .getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         sensorManager.registerListener(this, sensorAccel,
                 SensorManager.SENSOR_DELAY_UI);
-
-        // Sensor sensorGyro = sensorManager
-        // .getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        // sensorManager.registerListener(this, sensorGyro,
-        // SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     /**
      * アクティビティがポーズになったらリスナーを止める
      */
     public void onPause() {
-        if (sensorManager == null) {
-            return;
-        }
         sensorManager.unregisterListener(this);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         int type = event.sensor.getType();
-        // if (type != Sensor.TYPE_ACCELEROMETER && type !=
-        // Sensor.TYPE_GYROSCOPE) {
-        // return;
-        // }
-        if (type != Sensor.TYPE_LINEAR_ACCELERATION
-                && type != Sensor.TYPE_GYROSCOPE) {
+        if (type != Sensor.TYPE_LINEAR_ACCELERATION) {
             return;
         }
-
         estimater.onSensorEvent(event);
         float[] position = estimater.getPosition();
-        AccelerometerValue value = new AccelerometerValue(position[0],
-                position[1], position[2]);
+        PositionValue value = position == null ? null : new PositionValue(
+                position[0], position[1], position[2]);
         for (AccelerometerEventListener listener : listeners) {
             listener.accept(value);
         }
     }
 
+    /**
+     * 値をリセットします。
+     */
     public void reset() {
         estimater.reset();
     }

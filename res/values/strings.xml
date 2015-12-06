@@ -7,5 +7,6 @@
     <string name="valueY">Y</string>
     <string name="valueZ">Z</string>
     <string name="resetButton">Reset</string>
+    <string name="calibration">Calibration</string>
 
 </resources>

@@ -15,8 +15,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
+/**
+ * {@link MainActivity}
+ * 
+ * @author ujhrkzy
+ *
+ */
 public class MainActivity extends Activity {
     private final static int DEVICES_DIALOG = 1;
     private final static int ERROR_DIALOG = 2;
@@ -26,8 +33,12 @@ public class MainActivity extends Activity {
     private EditText editTextX;
     private EditText editTextY;
     private EditText editTextZ;
+    private CheckBox calibration;
     private String errorMessage = "";
 
+    /**
+     * Constructor
+     */
     public MainActivity() {
         // this.bluetoothTask = new BluetoothTask(this);
     }
@@ -39,14 +50,15 @@ public class MainActivity extends Activity {
         editTextX = (EditText) findViewById(R.id.editText1);
         editTextY = (EditText) findViewById(R.id.editText2);
         editTextZ = (EditText) findViewById(R.id.editText3);
+        calibration = (CheckBox) findViewById(R.id.calibrationCheckBox);
         List<AccelerometerEventListener> listeners = new ArrayList<AccelerometerEventListener>();
         AccelerometerEventListener listener = createViewEventListener(
                 editTextX, editTextY, editTextZ);
         listeners.add(listener);
         // listeners.add(bluetoothTask.createAccelerometerEventListener());
-        this.accelerometerSensor = new AccelerometerSensor(listeners);
-        accelerometerSensor.onCreate((SensorManager) this
-                .getSystemService(Context.SENSOR_SERVICE));
+        this.accelerometerSensor = new AccelerometerSensor(
+                (SensorManager) this.getSystemService(Context.SENSOR_SERVICE),
+                listeners);
 
         Button resetButton = (Button) findViewById(R.id.resetButton);
         resetButton.setOnClickListener(new OnClickListener() {
@@ -64,7 +76,15 @@ public class MainActivity extends Activity {
         return new AccelerometerEventListener() {
 
             @Override
-            public void accept(AccelerometerValue value) {
+            public void accept(PositionValue value) {
+                if (value == null) {
+                    calibration.setChecked(true);
+                    editTextX.setText(null);
+                    editTextY.setText(null);
+                    editTextZ.setText(null);
+                    return;
+                }
+                calibration.setChecked(false);
                 editTextX.setText(String.valueOf(value.getValueX()));
                 editTextY.setText(String.valueOf(value.getValueY()));
                 editTextZ.setText(String.valueOf(value.getValueZ()));
@@ -94,7 +114,7 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 
-    protected void restart() {
+    private void restart() {
         Intent intent = this.getIntent();
         this.finish();
         this.startActivity(intent);
@@ -120,7 +140,7 @@ public class MainActivity extends Activity {
         super.onPrepareDialog(id, dialog);
     }
 
-    // public Dialog createDevicesDialog() {
+    // private Dialog createDevicesDialog() {
     // AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
     // alertDialogBuilder.setTitle("Select device");
     //
@@ -146,15 +166,21 @@ public class MainActivity extends Activity {
     // return alertDialogBuilder.create();
     // }
 
+    /**
+     * エラーダイアログを表示します。
+     * 
+     * @param msg
+     *            メッセージ
+     */
     @SuppressWarnings("deprecation")
-    public void errorDialog(String msg) {
+    void errorDialog(String msg) {
         if (this.isFinishing())
             return;
         this.errorMessage = msg;
         this.showDialog(ERROR_DIALOG);
     }
 
-    public Dialog createErrorDialog() {
+    private Dialog createErrorDialog() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Error");
         alertDialogBuilder.setMessage("");
@@ -169,7 +195,13 @@ public class MainActivity extends Activity {
         return alertDialogBuilder.create();
     }
 
-    public void showWaitDialog(String msg) {
+    /**
+     * 待機ダイアログを表示します。
+     * 
+     * @param msg
+     *            メッセージ
+     */
+    void showWaitDialog(String msg) {
         if (waitDialog == null) {
             waitDialog = new ProgressDialog(this);
         }
@@ -178,7 +210,10 @@ public class MainActivity extends Activity {
         waitDialog.show();
     }
 
-    public void hideWaitDialog() {
+    /**
+     * 待機ダイアログを隠します。
+     */
+    void hideWaitDialog() {
         waitDialog.dismiss();
     }
 }

@@ -1,6 +1,18 @@
 package com.ujhrkzy.accelerometersender;
 
+/**
+ * {@link AccelerometerEventListener}
+ * 
+ * @author ujhrkzy
+ *
+ */
 public interface AccelerometerEventListener {
 
-    void accept(AccelerometerValue value);
+    /**
+     * {@link PositionValue} を処理します。
+     * 
+     * @param value
+     *            {@link PositionValue}
+     */
+    void accept(PositionValue value);
 }
