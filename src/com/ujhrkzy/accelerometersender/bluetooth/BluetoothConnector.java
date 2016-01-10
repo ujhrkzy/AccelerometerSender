@@ -1,4 +1,4 @@
-package com.ujhrkzy.accelerometersender;
+package com.ujhrkzy.accelerometersender.bluetooth;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +11,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.ujhrkzy.accelerometersender.MainActivity;
 
 /**
  * {@link BluetoothConnector}
@@ -84,23 +86,6 @@ public class BluetoothConnector {
      */
     public void doClose() {
         new CloseTask().execute();
-    }
-
-    public AccelerometerEventListener createAccelerometerEventListener() {
-        return new AccelerometerEventListener() {
-
-            @Override
-            public void accept(PositionValue value) {
-                String msg;
-                if (value == null) {
-                    msg = String.format("x:%s,y:%s,z:%s", 0, 0, 0);
-                } else {
-                    msg = String.format("x:%s,y:%s,z:%s", value.getValueX(),
-                            value.getValueY(), value.getValueZ());
-                }
-                doSend(msg);
-            }
-        };
     }
 
     /**

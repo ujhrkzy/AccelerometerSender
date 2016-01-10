@@ -2,14 +2,15 @@ package com.ujhrkzy.accelerometersender;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +18,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+
+import com.ujhrkzy.accelerometersender.bluetooth.BluetoothAccelerometerEventListener;
+import com.ujhrkzy.accelerometersender.bluetooth.BluetoothConnector;
+import com.ujhrkzy.accelerometersender.linearaccelerometer.PositionValue;
 
 /**
  * {@link MainActivity}
@@ -27,7 +32,7 @@ import android.widget.EditText;
 public class MainActivity extends Activity {
     private final static int DEVICES_DIALOG = 1;
     private final static int ERROR_DIALOG = 2;
-    // private final BluetoothTask bluetoothTask;
+    private final BluetoothConnector bluetoothConnector;
     private AccelerometerSensor accelerometerSensor;
     private ProgressDialog waitDialog;
     private EditText editTextX;
@@ -40,7 +45,7 @@ public class MainActivity extends Activity {
      * Constructor
      */
     public MainActivity() {
-        // this.bluetoothTask = new BluetoothTask(this);
+        this.bluetoothConnector = new BluetoothConnector(this);
     }
 
     @Override
@@ -55,7 +60,7 @@ public class MainActivity extends Activity {
         AccelerometerEventListener listener = createViewEventListener(
                 editTextX, editTextY, editTextZ);
         listeners.add(listener);
-        // listeners.add(bluetoothTask.createAccelerometerEventListener());
+        listeners.add(new BluetoothAccelerometerEventListener(bluetoothConnector));
         this.accelerometerSensor = new AccelerometerSensor(
                 (SensorManager) this.getSystemService(Context.SENSOR_SERVICE),
                 listeners);
@@ -65,7 +70,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 accelerometerSensor.reset();
-                // bluetoothTask.doSend("reset");
+                bluetoothConnector.doSend("reset");
             }
         });
     }
@@ -97,7 +102,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         accelerometerSensor.onResume();
-        // bluetoothTask.init();
+        bluetoothConnector.init();
         // ペアリング済みデバイスの一覧を表示してユーザに選ばせる。
         showDialog(DEVICES_DIALOG);
     }
@@ -110,14 +115,8 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        // bluetoothTask.doClose();
+        bluetoothConnector.doClose();
         super.onDestroy();
-    }
-
-    private void restart() {
-        Intent intent = this.getIntent();
-        this.finish();
-        this.startActivity(intent);
     }
 
     // ----------------------------------------------------------------
@@ -125,9 +124,9 @@ public class MainActivity extends Activity {
     @Override
     protected Dialog onCreateDialog(int id) {
         if (id == DEVICES_DIALOG)
-            // return createDevicesDialog();
-            if (id == ERROR_DIALOG)
-                return createErrorDialog();
+            return createDevicesDialog();
+        if (id == ERROR_DIALOG)
+            return createErrorDialog();
         return null;
     }
 
@@ -140,31 +139,31 @@ public class MainActivity extends Activity {
         super.onPrepareDialog(id, dialog);
     }
 
-    // private Dialog createDevicesDialog() {
-    // AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-    // alertDialogBuilder.setTitle("Select device");
-    //
-    // // ペアリング済みデバイスをダイアログのリストに設定する。
-    // Set<BluetoothDevice> pairedDevices = bluetoothTask.getPairedDevices();
-    // final BluetoothDevice[] devices = pairedDevices
-    // .toArray(new BluetoothDevice[0]);
-    // String[] items = new String[devices.length];
-    // for (int i = 0; i < devices.length; i++) {
-    // items[i] = devices[i].getName();
-    // }
-    //
-    // alertDialogBuilder.setItems(items,
-    // new DialogInterface.OnClickListener() {
-    // @Override
-    // public void onClick(DialogInterface dialog, int which) {
-    // dialog.dismiss();
-    // // 選択されたデバイスを通知する。そのまま接続開始。
-    // bluetoothTask.doConnect(devices[which]);
-    // }
-    // });
-    // alertDialogBuilder.setCancelable(false);
-    // return alertDialogBuilder.create();
-    // }
+    private Dialog createDevicesDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Select device");
+
+        // ペアリング済みデバイスをダイアログのリストに設定する。
+        Set<BluetoothDevice> pairedDevices = bluetoothConnector.getPairedDevices();
+        final BluetoothDevice[] devices = pairedDevices
+                .toArray(new BluetoothDevice[0]);
+        String[] items = new String[devices.length];
+        for (int i = 0; i < devices.length; i++) {
+            items[i] = devices[i].getName();
+        }
+
+        alertDialogBuilder.setItems(items,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        // 選択されたデバイスを通知する。そのまま接続開始。
+                        bluetoothConnector.doConnect(devices[which]);
+                    }
+                });
+        alertDialogBuilder.setCancelable(false);
+        return alertDialogBuilder.create();
+    }
 
     /**
      * エラーダイアログを表示します。
@@ -173,7 +172,7 @@ public class MainActivity extends Activity {
      *            メッセージ
      */
     @SuppressWarnings("deprecation")
-    void errorDialog(String msg) {
+    public void errorDialog(String msg) {
         if (this.isFinishing())
             return;
         this.errorMessage = msg;
@@ -201,7 +200,7 @@ public class MainActivity extends Activity {
      * @param msg
      *            メッセージ
      */
-    void showWaitDialog(String msg) {
+    public void showWaitDialog(String msg) {
         if (waitDialog == null) {
             waitDialog = new ProgressDialog(this);
         }
@@ -213,7 +212,7 @@ public class MainActivity extends Activity {
     /**
      * 待機ダイアログを隠します。
      */
-    void hideWaitDialog() {
+    public void hideWaitDialog() {
         waitDialog.dismiss();
     }
 }

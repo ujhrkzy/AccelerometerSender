@@ -7,15 +7,20 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import com.ujhrkzy.accelerometersender.gyroscope.GyroscopePositionEstimator;
+import com.ujhrkzy.accelerometersender.linearaccelerometer.PositionValue;
+
 /**
- * {@link AccelerometerSensor}
  * 
+ * {@link AccelerometerSensor}
+ *
  * @author ujhrkzy
  *
  */
 public class AccelerometerSensor implements SensorEventListener {
 
-    private final PositionEstimator estimater = new PositionEstimator();
+    // TBD {@link PositionEstimater} で抽象化する。
+    private final GyroscopePositionEstimator estimater = new GyroscopePositionEstimator();
     private final List<AccelerometerEventListener> listeners;
     private final SensorManager sensorManager;
 
@@ -41,9 +46,13 @@ public class AccelerometerSensor implements SensorEventListener {
      * アクティビティが動き始めたらリスナーを登録する
      */
     public void onResume() {
-        Sensor sensorAccel = sensorManager
-                .getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        sensorManager.registerListener(this, sensorAccel,
+        // Sensor sensorAccel = sensorManager
+        // .getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        // sensorManager.registerListener(this, sensorAccel,
+        // SensorManager.SENSOR_DELAY_UI);
+        Sensor sensorGyroscope = sensorManager
+                .getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        sensorManager.registerListener(this, sensorGyroscope,
                 SensorManager.SENSOR_DELAY_UI);
     }
 
@@ -57,7 +66,7 @@ public class AccelerometerSensor implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         int type = event.sensor.getType();
-        if (type != Sensor.TYPE_LINEAR_ACCELERATION) {
+        if (type != Sensor.TYPE_GYROSCOPE) {
             return;
         }
         estimater.onSensorEvent(event);

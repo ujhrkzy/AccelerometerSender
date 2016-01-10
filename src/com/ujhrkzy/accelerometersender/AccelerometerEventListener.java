@@ -1,5 +1,7 @@
 package com.ujhrkzy.accelerometersender;
 
+import com.ujhrkzy.accelerometersender.linearaccelerometer.PositionValue;
+
 /**
  * {@link AccelerometerEventListener}
  * 

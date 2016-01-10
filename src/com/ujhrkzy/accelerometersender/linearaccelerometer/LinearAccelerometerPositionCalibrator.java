@@ -1,14 +1,14 @@
-package com.ujhrkzy.accelerometersender;
+package com.ujhrkzy.accelerometersender.linearaccelerometer;
 
 import android.hardware.SensorEvent;
 
 /**
- * {@link PositionCalibrator}
+ * {@link LinearAccelerometerPositionCalibrator}
  * 
  * @author ujhrkzy
  *
  */
-public class PositionCalibrator {
+public class LinearAccelerometerPositionCalibrator {
     private static final int COUNT_MAX = 100;
     private float[] positions = { 0, 0, 0 };
     private float[] averagePositions = null;

@@ -1,4 +1,4 @@
-package com.ujhrkzy.accelerometersender;
+package com.ujhrkzy.accelerometersender.linearaccelerometer;
 
 /**
  * {@link Vector3f}
@@ -31,6 +31,10 @@ public class Vector3f {
 
     public float[] getValues() {
         return values;
+    }
+
+    public void setValue(int index, float value) {
+        values[index] = value;
     }
 
     public void set(float x, float y, float z) {

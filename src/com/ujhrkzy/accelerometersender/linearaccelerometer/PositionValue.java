@@ -1,4 +1,4 @@
-package com.ujhrkzy.accelerometersender;
+package com.ujhrkzy.accelerometersender.linearaccelerometer;
 
 /**
  * {@link PositionValue}

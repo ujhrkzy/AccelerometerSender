@@ -1,21 +1,21 @@
-package com.ujhrkzy.accelerometersender;
+package com.ujhrkzy.accelerometersender.linearaccelerometer;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 
 /**
- * {@link PositionEstimator}
+ * {@link LinearAccelerometerPositionEstimator}
  * 
  * @author ujhrkzy
  *
  */
-public class PositionEstimator {
+public class LinearAccelerometerPositionEstimator {
 
     // Create a constant to convert nanoseconds to seconds.
     private static final float NS2S = 1.0f / 1000000000.0f;
     // Create a constant to convert Meter to MilliMeter
-    private static final float M2MM = 1000f;
-    private final PositionCalibrator calibrator = new PositionCalibrator();
+    private static final float M2MM = 1000.0f;
+    private final LinearAccelerometerPositionCalibrator calibrator = new LinearAccelerometerPositionCalibrator();
     private final boolean landscape;
     private final Vector3f accVector = new Vector3f(0, 0, 0);
     private final Vector3f velocityVector = new Vector3f(0, 0, 0);
@@ -26,7 +26,7 @@ public class PositionEstimator {
     /**
      * Constructor
      */
-    public PositionEstimator() {
+    public LinearAccelerometerPositionEstimator() {
         this(false);
     }
 
@@ -36,7 +36,7 @@ public class PositionEstimator {
      * @param landscape
      *            landscapeの場合、 {@code true}
      */
-    public PositionEstimator(boolean landscape) {
+    public LinearAccelerometerPositionEstimator(boolean landscape) {
         this.landscape = landscape;
     }
 
@@ -90,7 +90,6 @@ public class PositionEstimator {
         } else {
             accVector.set(index0Value, index1Value, index2Value);
         }
-        System.out.println("index0:" + index0Value);
         long currentEventTime = event.timestamp;
         estimatePosition(0, currentEventTime);
         estimatePosition(1, currentEventTime);
@@ -103,24 +102,27 @@ public class PositionEstimator {
 
         // velocity(mm/s)
         float oldVelocity = velocityVector.getValues()[index];
-        velocityVector.getValues()[index] = accVector.getValues()[index] * dt
-                * M2MM;
+        velocityVector.setValue(index, accVector.getValues()[index] * dt * M2MM
+                + oldVelocity);
         // velocityVector.values[0] += accVector.values[0] * dt * M2MM;
 
         if (checkVelocity(velocityVector.getValues()[index])) {
             // x(t) = 1/2 * 加速度 * t^2 + v0 * t + x0
-            posVec.getValues()[index] = velocityVector.getValues()[index] * dt
-                    / 2 + (oldVelocity * dt);
+            posVec.setValue(index, (accVector.getValues()[index] * dt * dt
+                    * M2MM / 2)
+                    + (oldVelocity * dt));
+            // posVec.setValue(index, velocityVector.getValues()[index] * dt
+            // + (oldVelocity * dt));
             pos[index] += posVec.getValues()[index];
         } else {
-            velocityVector.getValues()[index] = 0;
+            velocityVector.setValue(index, 0);
         }
         lastAccelTime[index] = currentEventTime;
     }
 
     private boolean checkVelocity(float velocity) {
         float absVelocity = Math.abs(velocity);
-        return absVelocity > 16f && absVelocity < 80f;
+        return absVelocity > 80f && absVelocity < 10000f;
     }
 
     private float[] create(float value) {
