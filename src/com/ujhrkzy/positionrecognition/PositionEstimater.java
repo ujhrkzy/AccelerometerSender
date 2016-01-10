@@ -1,14 +1,14 @@
-package com.ujhrkzy.accelerometersender;
+package com.ujhrkzy.positionrecognition;
 
-import com.ujhrkzy.accelerometersender.linearaccelerometer.PositionValue;
+import com.ujhrkzy.positionrecognition.linearaccelerometer.PositionValue;
 
 /**
- * {@link AccelerometerEventListener}
+ * {@link PositionEstimater}
  * 
  * @author ujhrkzy
  *
  */
-public interface AccelerometerEventListener {
+public interface PositionEstimater {
 
     /**
      * {@link PositionValue} を処理します。

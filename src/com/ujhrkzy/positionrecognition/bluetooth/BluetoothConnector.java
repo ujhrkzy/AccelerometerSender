@@ -1,4 +1,4 @@
-package com.ujhrkzy.accelerometersender.bluetooth;
+package com.ujhrkzy.positionrecognition.bluetooth;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +12,7 @@ import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.ujhrkzy.accelerometersender.MainActivity;
+import com.ujhrkzy.positionrecognition.MainActivity;
 
 /**
  * {@link BluetoothConnector}

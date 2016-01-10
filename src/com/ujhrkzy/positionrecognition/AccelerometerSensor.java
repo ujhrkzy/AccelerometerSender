@@ -1,4 +1,4 @@
-package com.ujhrkzy.accelerometersender;
+package com.ujhrkzy.positionrecognition;
 
 import java.util.List;
 
@@ -7,8 +7,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-import com.ujhrkzy.accelerometersender.gyroscope.GyroscopePositionEstimator;
-import com.ujhrkzy.accelerometersender.linearaccelerometer.PositionValue;
+import com.ujhrkzy.positionrecognition.gyroscope.GyroscopePositionEstimator;
+import com.ujhrkzy.positionrecognition.linearaccelerometer.PositionValue;
 
 /**
  * 

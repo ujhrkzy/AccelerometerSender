@@ -1,7 +1,7 @@
-package com.ujhrkzy.accelerometersender.bluetooth;
+package com.ujhrkzy.positionrecognition.bluetooth;
 
-import com.ujhrkzy.accelerometersender.AccelerometerEventListener;
-import com.ujhrkzy.accelerometersender.linearaccelerometer.PositionValue;
+import com.ujhrkzy.positionrecognition.AccelerometerEventListener;
+import com.ujhrkzy.positionrecognition.linearaccelerometer.PositionValue;
 
 /**
  * {@link BluetoothAccelerometerEventListener}

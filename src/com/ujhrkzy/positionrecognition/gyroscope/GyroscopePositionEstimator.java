@@ -1,4 +1,4 @@
-package com.ujhrkzy.accelerometersender.gyroscope;
+package com.ujhrkzy.positionrecognition.gyroscope;
 
 import android.hardware.SensorEvent;
 

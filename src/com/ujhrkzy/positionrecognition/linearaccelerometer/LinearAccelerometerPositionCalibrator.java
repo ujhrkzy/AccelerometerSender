@@ -1,4 +1,4 @@
-package com.ujhrkzy.accelerometersender.linearaccelerometer;
+package com.ujhrkzy.positionrecognition.linearaccelerometer;
 
 import android.hardware.SensorEvent;
 

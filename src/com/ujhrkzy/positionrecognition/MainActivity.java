@@ -1,4 +1,4 @@
-package com.ujhrkzy.accelerometersender;
+package com.ujhrkzy.positionrecognition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +19,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-import com.ujhrkzy.accelerometersender.bluetooth.BluetoothAccelerometerEventListener;
-import com.ujhrkzy.accelerometersender.bluetooth.BluetoothConnector;
-import com.ujhrkzy.accelerometersender.linearaccelerometer.PositionValue;
+import com.ujhrkzy.accelerometersender.R;
+import com.ujhrkzy.positionrecognition.bluetooth.BluetoothAccelerometerEventListener;
+import com.ujhrkzy.positionrecognition.bluetooth.BluetoothConnector;
+import com.ujhrkzy.positionrecognition.linearaccelerometer.PositionValue;
 
 /**
  * {@link MainActivity}
